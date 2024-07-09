@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.metric.auth.core.persistence.dao.SysDeptDao">
+
+    <sql id="Base_Column_List" >
+      id, `name`, parent_id, `level`, seq, remark, operator, operate_time, operate_ip
+    </sql>
+
+    <update id="batchUpdateParentAndLevel">
+        <foreach collection="deptList" item="dept" separator=";">
+            UPDATE t_auth_sys_dept
+            SET parent = #{dept.parentId}, level = #{dept.level}
+            WHERE id = #{dept.id}
+        </foreach>
+    </update>
+
+    <select id="selectByNameAndParentId" resultType="com.metric.auth.core.persistence.entity.SysDept">
+        select id, `name`, parent_id, `level`, seq, remark, operator, operator_time, operator_ip
+        from t_auth_sys_dept
+        where name = #{deptName}
+        <if test="parentId != null">
+            and parent_id = #{parentId}
+        </if>
+        <if test="id != null">
+            and id != #{id}
+        </if>
+    </select>
+
+    <select id="countByParentId" resultType="java.lang.Integer">
+      select count(*)
+      from t_auth_sys_dept
+      where parent_id = #{deptId}
+    </select>
+
+    <select id="getChildDeptListByLevel" resultType="com.metric.auth.core.persistence.entity.SysDept">
+      select
+        <include refid="Base_Column_List" />
+      from t_auth_sys_dept
+      WHERE level like #{level} || '%'
+    </select>
+
+    <select id="getAllDept" resultType="com.metric.auth.core.persistence.entity.SysDept">
+        select
+          <include refid="Base_Column_List" />
+        from t_auth_sys_dept
+    </select>
+</mapper>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 文件配置, 默认不显示配置加载的自身状态, 配置刷新间隔为60秒 -->
+<Configuration monitorInterval="60" status="OFF">
+    <Properties>
+        <!-- 服务名称, (可改), module 名称, 影响日志文件名 -->
+        <Property name="service.name">auth</Property>
+        <!-- 日志文件路径, (可改) -->
+        <Property name="log.path">log</Property>
+        <!-- console 的输出格式, 主要用在开发, (可改), 下面pattern中的serviceName是日志行中的常量, 可以改成项目名字等, 让日志更整齐 -->
+        <Property name="stdout.pattern">
+            %d{HH:mm:ss.SSS} auth [%t] %highlight{%-5level} %style{[%40.40c{-10}]}{cyan} -
+            %msg%n%ex{full}
+        </Property>
+        <!-- 日志文件 的输出格式, 主要用在生产, (可改), 下面pattern中的serviceName是日志行中的常量, 可以改成项目名字等, 让日志更整齐 -->
+        <Property name="logfile.pattern">
+            %d{HH:mm:ss.SSS} auth [%t] %-5level [%40.40c{-10}] - %msg%n%ex{full}
+        </Property>
+        <!-- 自定义 logger 输出格式 -->
+        <Property name="log.customize.pattern">
+            %d{HH:mm:ss.SSS} auth %-5level - %msg%n%ex{full}
+        </Property>
+        <!-- api统计日志文件 的输出格式, 主要用在生产, (可改), 下面pattern中的serviceName是日志行中的常量, 可以改成项目名字等, 让日志更整齐 -->
+        <Property name="log.statics.pattern">
+            %d{HH:mm:ss.SSS} - %msg%n%ex{full}
+        </Property>
+    </Properties>
+
+    <!-- 定义输出信息 -->
+    <Appenders>
+        <!-- 控制台 -->
+        <Console name="STDOUT">
+            <PatternLayout charset="utf-8" pattern="${stdout.pattern}"/>
+        </Console>
+
+        <!-- 所有日志-本地 -->
+        <RollingRandomAccessFile append="true"
+            fileName="${log.path}/${service.name}.log"
+            filePattern="${log.path}/${service.name}.%d{yyyy-MM-dd}.%i.log"
+            name="LOG_FILE">
+            <PatternLayout charset="utf-8" pattern="${logfile.pattern}"/>
+            <Policies>
+                <!-- 隔天重新生成文件 -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <!-- 50m 生成新文件 -->
+                <SizeBasedTriggeringPolicy size="50MB"/>
+            </Policies>
+            <!-- 每天文件最多生成20个 本地最多保存7天 -->
+            <DefaultRolloverStrategy max="20">
+                <Delete basePath="${log.path}" maxDepth="2">
+                    <IfFileName glob="*/${service.name}.*.log"/>
+                    <IfLastModified age="30d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingRandomAccessFile>
+
+        <!-- 错误日志-本地 -->
+        <RollingRandomAccessFile append="true"
+            fileName="${log.path}/${service.name}.error.log"
+            filePattern="${log.path}/${service.name}.error.%d{yyyy-MM-dd}.%i.log"
+            name="LOG_ERR_FILE">
+            <PatternLayout charset="utf-8" pattern="${logfile.pattern}"/>
+            <Policies>
+                <!-- 隔天重新生成文件 -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <!-- 50m 生成新文件 -->
+                <SizeBasedTriggeringPolicy size="50MB"/>
+            </Policies>
+            <!-- 每天文件最多生成20个 本地最多保存7天 -->
+            <DefaultRolloverStrategy max="20">
+                <Delete basePath="${log.path}" maxDepth="2">
+                    <IfFileName glob="*/${service.name}.error.*.log"/>
+                    <IfLastModified age="30d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingRandomAccessFile>
+
+        <!-- request 统计日志-本地 -->
+        <RollingRandomAccessFile append="true"
+            fileName="${log.path}/${service.name}-request-statics.log"
+            filePattern="${log.path}/${service.name}-request-statics.%d{yyyy-MM-dd}.%i.log"
+            name="REQUEST_STATICS_LOCAL">
+            <PatternLayout charset="utf-8" pattern="${log.statics.pattern}"/>
+            <Policies>
+                <!-- 隔天重新生成文件 -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <!-- 50m 生成新文件 -->
+                <SizeBasedTriggeringPolicy size="50MB"/>
+            </Policies>
+            <!-- 每天文件最多生成20个 本地最多保存7天 -->
+            <DefaultRolloverStrategy max="20">
+                <Delete basePath="${log.path}" maxDepth="2">
+                    <IfFileName glob="*/${service.name}-request-statics.*.log"/>
+                    <IfLastModified age="30d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingRandomAccessFile>
+    </Appenders>
+
+    <!-- 配置输出信息 -->
+    <!-- 为什么这么配置? 首先, console和info、error日志, 由rootLogger执行输出, 这样代码里可以直接根据类名获取到rootLogger, 方便使用 -->
+    <!-- 然后是 REQUEST_STATICS Logger, 需要根据 Logger name 获得, 这个配置本质上没有任何作用, 独立的 Logger 只是希望 api 的统计信息, 能单独打一份冗余信息到这个输出中, 方便未来应用这部分数据, 比如 SLA、qps预估、限流等应用场景 -->
+    <Loggers>
+        <!-- 日志没有 %l/%location 所以不需要includeLocation -->
+        <root includeLocation="false" level="INFO">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="LOG_FILE"/>
+            <AppenderRef level="ERROR" ref="LOG_ERR_FILE"/>
+        </root>
+
+        <!-- api统计日志 -->
+        <Logger includeLocation="false" level="INFO" name="REQUEST_STATICS">
+            <AppenderRef ref="REQUEST_STATICS_LOCAL"/>
+        </Logger>
+    </Loggers>
+</Configuration>

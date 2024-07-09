@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.metric.auth.core.persistence.mapper.SysAclMapper">
+
+    <select id="selectByNameAndAclModule" resultType="com.metric.auth.core.persistence.entity.SysAcl">
+        select *
+        from t_auth_sys_acl
+        where acl_module_id = #{aclModuleId}
+        AND name = #{name}
+        <if test="id != null">
+            AND id != #{id}
+        </if>
+    </select>
+</mapper>

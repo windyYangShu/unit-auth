@@ -1,0 +1,21 @@
+# 项目详情
+
+## 项目简介
+提供分布式环境下SSO
+
+## 请求返回状态定义
+* **SUCCESS: 200**
+* **BAD_REQUEST: 4000**
+* **TOKEN_INVALID: 4001**
+* **UN_PROCESSABLE_REQUEST: 4002**
+* **NO_PERMISSION: 4003**
+* **RES_NOT_FOUNT: 4004**
+* **ENUM_NOT_PRESENT: 4005**
+* **RES_DUPLICATE_RECORD: 4009**
+* **SERVER_ERROR: 5000**
+* **REMOTE_SERVER_EXCEPTION: 5001**
+* **NETWORK_TIMEOUT: 5002**
+* **NETWORK_EXCEPTION: 5003**
+
+## Contact
+有任何问题请联系我：windyyangshu@gmail.com

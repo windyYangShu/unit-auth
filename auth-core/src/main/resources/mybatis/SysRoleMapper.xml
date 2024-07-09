@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.metric.auth.core.persistence.mapper.SysRoleMapper">
+
+    <sql id="Base_Column_List" >
+      id, `name`, `type`, status, remark
+    </sql>
+
+    <select id="selectByName" resultType="com.metric.auth.core.persistence.entity.SysRole">
+        SELECT *
+        FROM t_auth_sys_role
+        WHERE name = #{name}
+        <if test="id != null">
+            AND id != #{id}
+        </if>
+    </select>
+
+    <select id="selectByMail" resultType="com.metric.auth.core.persistence.entity.SysRole">
+        SELECT *
+        FROM t_auth_sys_role
+        WHERE mail = #{mail}
+        <if test="id != null">
+            AND id != #{id}
+        </if>
+    </select>
+
+    <select id="selectByTelephone" resultType="com.metric.auth.core.persistence.entity.SysRole">
+        SELECT *
+        FROM t_auth_sys_role
+        WHERE telephone = #{telephone}
+        <if test="id != null">
+            AND id != #{id}
+        </if>
+    </select>
+
+    <select id="getRoleByUser" resultType="com.metric.auth.core.persistence.entity.SysRole">
+      select
+        r.id, r.`name`, r.`type`, r.status, r.remark
+      from t_auth_sys_role as r inner join t_auth_sys_role_user as ru
+        on r.id = ru.role_id
+      where ru.user_id = #{userId}
+    </select>
+</mapper>

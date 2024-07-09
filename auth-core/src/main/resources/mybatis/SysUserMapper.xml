@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.metric.auth.core.persistence.mapper.SysUserMapper">
+
+    <select id="getUserByName" resultType="com.metric.auth.core.persistence.entity.SysUser">
+        select id, username, telephone, mail, password, dept_id, status, remark
+          from t_auth_sys_user
+        where username = #{userName}
+    </select>
+
+    <select id="countByDeptId" resultType="java.lang.Integer">
+        select count(1)
+        from t_auth_sys_user
+        WHERE deptId = #{deptId}
+    </select>
+
+    <select id="getUserByTelephone" resultType="com.metric.auth.core.persistence.entity.SysUser">
+        select *
+        from t_auth_sys_user
+        where telephone = #{telephone}
+    </select>
+
+    <select id="getUserByMail" resultType="com.metric.auth.core.persistence.entity.SysUser">
+        select *
+        from t_auth_sys_user
+        where mail = #{mail}
+    </select>
+    <select id="getAllUser" resultType="com.metric.auth.core.persistence.entity.SysUser">
+
+    </select>
+</mapper>

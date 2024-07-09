@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.metric.auth.core.persistence.mapper.SysAclModuleMapper">
+
+    <sql id="Base_Column_List" >
+      id, name, parent_id, level, seq, status, remark, operator, operate_time, operate_ip
+    </sql>
+    <update id="batchUpdateParentAndLevel">
+        <foreach collection="aclModules" item="module" separator=";">
+            UPDATE t_auth_sys_dept
+            SET parent = #{module.parentId}, level = #{module.level}
+            WHERE id = #{module.id}
+        </foreach>
+    </update>
+
+    <select id="selectByNameAndParentId" resultType="com.metric.auth.core.persistence.entity.SysAclModule">
+        SELECT *
+        FROM t_auth_sys_acl_module
+        WHERE name = #{name}
+        <if test="parentId != null">
+            AND parent_id = #{parentId}
+        </if>
+        <if test="id != null">
+            AND id != #{id}
+        </if>
+    </select>
+
+    <select id="getChildAclModuleListByLevel"
+            resultType="com.metric.auth.core.persistence.entity.SysAclModule">
+        select
+        <include refid="Base_Column_List" />
+        from t_auth_sys_dept
+        WHERE level like #{level} || '%'
+    </select>
+
+    <select id="getAllAclModule" resultType="com.metric.auth.core.persistence.entity.SysAclModule">
+        SELECT <include refid="Base_Column_List" />
+        FROM sys_acl_module
+    </select>
+</mapper>
